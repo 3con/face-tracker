@@ -1,0 +1,8 @@
+app:
+    build: .
+    volumes:
+      - ./src:/usr/src/app
+
+    env_file: .env
+    environment:
+      - SLS_DEBUG=*

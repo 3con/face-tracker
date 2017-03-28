@@ -1,0 +1,8 @@
+.idea
+node_modules
+*.zip
+build
+dist
+.serverless
+.env
+TODO.md
