@@ -1,0 +1,27 @@
+{
+  "name": "tracker",
+  "version": "0.1.0",
+  "description": "",
+  "dependencies": {
+    "async": "2.2.0",
+    "aws-sdk": "2.33.0",
+    "lodash": "4.17.4",
+    "moment": "2.18.1",
+    "q": "1.5.0",
+    "request": "2.81.0",
+    "uuid": "3.0.1"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {},
+  "engines": {
+    "node": "~4.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "lambda"
+  ],
+  "author": "Maarten Huijsmans",
+  "homepage": "https://tracker.webmonks.io"
+}
