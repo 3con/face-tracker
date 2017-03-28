@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="initial-scale=1"/>
+        <title>Face Tracker</title>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="page-header">
+                <h1>Face Analytics</h1>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <video id="player" style="transform: scaleX(-1);" width="640" height="480" controls autoplay></video>
+                    <canvas id="canvas2" style="transform: scaleX(-1);margin-top: -500px;" width="640" height="480"></canvas>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                </div>
+                <div class="col-md-4">
+                    <p><i class="fa fa-refresh fa-spin"></i> Analyzing ...</p>
+                    <table class="table table-striped">
+                        <tr><td>Age range</td><td id="age">...</td></tr>
+                        <tr><td>Smiling</td><td id="smiling">...</td></tr>
+                        <tr><td>Gender</td><td id="gender">...</td></tr>
+                        <tr><td>Beard</td><td id="beard">...</td></tr>
+                        <tr><td>Emotion</td><td id="emotion">...</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row" style="display:none;">
+                <div class="col-md-8">
+                    <img id="photo" alt="Captured debug frames here">
+                </div>
+            </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script>
+            var player = document.getElementById('player');
+            var canvas = document.getElementById('canvas');
+            var photo = document.getElementById('photo');
+            var width = 640;
+            var height = 480;
+
+            function success(data) {
+                //console.log(data);
+                if (data['FaceDetails'].length> 0) {
+                    // Add details
+                    var details = data['FaceDetails'][0];
+                    $('#age').html(details['AgeRange']['Low'] + '-' + details['AgeRange']['High']);
+                    $('#smiling').html(details['Smile']['Value'].toString());
+                    $('#gender').html(details['Gender']['Value']);
+                    $('#beard').html(details['Beard']['Value'].toString());
+
+                    var emotions = details['Emotions'];
+                    var max = Math.max.apply(Math, emotions.map(function (i) {
+                        return i['Confidence'];
+                    }));
+                    var emo = emotions.filter(function (i) {
+                        return i['Confidence'] === max;
+                    })[0];
+                    $('#emotion').html(emo['Type'].toLowerCase());
+
+                    // Draw box
+                    var boundingBox = details['BoundingBox'];
+                    var c2 = document.getElementById("canvas2");
+                    var ctx = c2.getContext('2d');
+                    ctx.clearRect(0, 0, width, height);
+                    ctx.strokeStyle="red";
+
+                    ctx.beginPath();
+                    ctx.rect(boundingBox['Left'] * width,
+                        boundingBox['Top'] * height,
+                        boundingBox['Width'] * width,
+                        boundingBox['Height'] * height
+                    );
+                    ctx.stroke();
+                    ctx.closePath();
+
+                } else {
+                    $('#age').html("");
+                    $('#smiling').html("");
+                    $('#gender').html("");
+                    $('#beard').html("");
+                    $('#emotion').html("");
+                }
+            }
+
+            function postImage(data) {
+                //console.log(data);
+                $.ajax("https://tracker.webmonks.io/analyze", {
+                    data: JSON.stringify({image: data}),
+                    contentType: 'application/json',
+                    type: 'POST',
+                    dataType: 'json',
+                    success: success
+                });
+            }
+
+            function takeImage() {
+                var context = canvas.getContext('2d');
+                canvas.width = width;
+                canvas.height = height;
+                context.drawImage(player, 0, 0, width, height);
+                var data = canvas.toDataURL('image/png');
+                photo.setAttribute('src', data);
+                postImage(data);
+            }
+
+            function handleSuccess (stream) {
+                player.srcObject = stream;
+            }
+
+            navigator.mediaDevices.getUserMedia({video: true}).then(handleSuccess);
+            setInterval(takeImage, 1000);
+        </script>
+    </body>
+</html>
