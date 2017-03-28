@@ -19,7 +19,7 @@ frameworkVersion: "=1.9.0"
 
 provider:
   name: aws
-  description: WebApp to analyze faces via the webcan
+  description: WebApp to analyze faces via the webcam
   region: eu-west-1
   stage: v1
   runtime: nodejs4.3

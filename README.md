@@ -1,6 +1,6 @@
 # Face Tracker
 
-POC to identify faces with AWS Rekognition. The WebApp is developed with the 
+POC to analyze faces with AWS Rekognition. The WebApp is developed with the 
 [serverless framework](https://serverless.com/) and deployed on  [AWS Lambda](https://aws.amazon.com/lambda/). 
 The WebApp is available on [https://tracker.webmonks.io/](https://ads-api.webmonks.io/).
 
